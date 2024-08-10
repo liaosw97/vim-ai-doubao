@@ -20,7 +20,7 @@ class KnownError(Exception):
     pass
 
 def load_api_key():
-    config_file_path = os.path.expanduser(vim.eval("g:vim_ai_token_file_path"))
+    config_file_path = os.path.expanduser(vim.eval("g:vim_ai_config_file_path"))
     api_key_param_value = os.getenv("OPENAI_API_KEY")
     try:
         with open(config_file_path, 'r') as file:
@@ -199,19 +199,14 @@ def printDebug(text, *args):
 OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
-def openai_request(url, data, options):
-    enable_auth=options['enable_auth']
+def openai_request(url, data, http_options,token):
     headers = {
         "Content-Type": "application/json",
     }
-    if enable_auth:
-        (OPENAI_API_KEY, OPENAI_ORG_ID) = load_api_key()
-        headers['Authorization'] = f"Bearer {OPENAI_API_KEY}"
+    headers['Authorization'] = f"Bearer {token}"
 
-        if OPENAI_ORG_ID is not None:
-            headers["OpenAI-Organization"] =  f"{OPENAI_ORG_ID}"
 
-    request_timeout=options['request_timeout']
+    request_timeout=http_options['request_timeout']
     req = urllib.request.Request(
         url,
         data=json.dumps({ **data }).encode("utf-8"),

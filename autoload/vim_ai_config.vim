@@ -1,13 +1,52 @@
 let s:plugin_root = expand('<sfile>:p:h:h')
 
+if !exists("g:vim_ai_debug_log_file")
+  let g:vim_ai_debug_log_file = "/tmp/vim_ai_debug.log"
+endif
+
+if !exists("g:vim_ai_config_file_path")
+  let g:vim_ai_config_file_path = expand("~")."/.config/vim-ai-token.json"
+endif
+
+if !exists("g:vim_ai_name")
+  let g:vim_ai_name = "doubao"
+endif
+
+if !exists("g:vim_ai_roles_config_file")
+  let g:vim_ai_roles_config_file = s:plugin_root . "/roles-example.ini"
+endif
+
+" read json from g:vim_ai_config_file_path,and encode to json
+if filereadable(g:vim_ai_config_file_path)
+  let g:vim_ai_config_map = json_decode(join(readfile(g:vim_ai_config_file_path)))
+  if !has_key(g:vim_ai_config_map, "model")
+    let g:vim_ai_config_map["model"] = ""
+  endif
+  if !has_key(g:vim_ai_config_map, "endpoint_url")
+    let g:vim_ai_config_map["endpoint_url"] = ""
+  endif
+  if !has_key(g:vim_ai_config_map, "token")
+    echoerr "token not found in " . g:vim_ai_config_file_path
+    finish
+  endif
+else
+  " default set openai
+  let g:vim_ai_config_map = {
+        \  "model": "gpt-3.5-turbo",
+        \  "endpoint_url": "https://api.openai.com/v1/chat/completions",
+        \  "token": "",
+        \}
+endif
+
 let g:vim_ai_complete_default = {
 \  "engine": "complete",
 \  "options": {
-\    "model": "gpt-3.5-turbo-instruct",
-\    "endpoint_url": "https://api.openai.com/v1/completions",
-\    "max_tokens": 1000,
-\    "temperature": 0.1,
-\    "request_timeout": 20,
+\    "model": g:vim_ai_config_map["model"],
+\    "endpoint_url": g:vim_ai_config_map["endpoint_url"],
+\    "token": g:vim_ai_config_map["token"],
+\    "max_tokens": (has_key(g:vim_ai_config_map, "max_tokens") ? g:vim_ai_config_map["max_tokens"] : 1000),
+\    "temperature": (has_key(g:vim_ai_config_map, "temperature") ? g:vim_ai_config_map["temperature"] : 0.1),
+\    "request_timeout": (has_key(g:vim_ai_config_map, "request_timeout") ? g:vim_ai_config_map["request_timeout"] : 20),
 \    "enable_auth": 1,
 \    "selection_boundary": "#####",
 \  },
@@ -15,21 +54,8 @@ let g:vim_ai_complete_default = {
 \    "paste_mode": 1,
 \  },
 \}
-let g:vim_ai_edit_default = {
-\  "engine": "complete",
-\  "options": {
-\    "model": "gpt-3.5-turbo-instruct",
-\    "endpoint_url": "https://api.openai.com/v1/completions",
-\    "max_tokens": 1000,
-\    "temperature": 0.1,
-\    "request_timeout": 20,
-\    "enable_auth": 1,
-\    "selection_boundary": "#####",
-\  },
-\  "ui": {
-\    "paste_mode": 1,
-\  },
-\}
+
+let g:vim_ai_edit_default= g:vim_ai_complete_default
 
 let s:initial_chat_prompt =<< trim END
 >>> system
@@ -39,11 +65,12 @@ If you attach a code block add syntax type after ``` to enable syntax highlighti
 END
 let g:vim_ai_chat_default = {
 \  "options": {
-\    "model": "gpt-4o",
-\    "endpoint_url": "https://api.openai.com/v1/chat/completions",
-\    "max_tokens": 0,
-\    "temperature": 1,
-\    "request_timeout": 20,
+\    "model": g:vim_ai_config_map["model"],
+\    "endpoint_url": g:vim_ai_config_map["endpoint_url"],
+\    "token": g:vim_ai_config_map["token"],
+\    "max_tokens": (has_key(g:vim_ai_config_map, "max_tokens") ? g:vim_ai_config_map["max_tokens"] : 1000),
+\    "temperature": (has_key(g:vim_ai_config_map, "temperature") ? g:vim_ai_config_map["temperature"] : 0.1),
+\    "request_timeout": (has_key(g:vim_ai_config_map, "request_timeout") ? g:vim_ai_config_map["request_timeout"] : 20),
 \    "enable_auth": 1,
 \    "selection_boundary": "",
 \    "initial_prompt": s:initial_chat_prompt,
@@ -62,21 +89,12 @@ if !exists("g:vim_ai_open_chat_presets")
   \  "preset_below": "below new | call vim_ai#MakeScratchWindow()",
   \  "preset_tab": "tabnew | call vim_ai#MakeScratchWindow()",
   \  "preset_right": "rightbelow 55vnew | setlocal noequalalways | setlocal winfixwidth | call vim_ai#MakeScratchWindow()",
+  \  "preset_left": "leftbelow 55vnew | setlocal noequalalways | setlocal winfixwidth | call vim_ai#MakeScratchWindow()",
   \}
 endif
 
 if !exists("g:vim_ai_debug")
   let g:vim_ai_debug = 0
-endif
-
-if !exists("g:vim_ai_debug_log_file")
-  let g:vim_ai_debug_log_file = "/tmp/vim_ai_debug.log"
-endif
-if !exists("g:vim_ai_token_file_path")
-  let g:vim_ai_token_file_path = "~/.config/openai.token"
-endif
-if !exists("g:vim_ai_roles_config_file")
-  let g:vim_ai_roles_config_file = s:plugin_root . "/roles-example.ini"
 endif
 
 function! vim_ai_config#ExtendDeep(defaults, override) abort

@@ -124,11 +124,22 @@ function! s:GetVisualSelection()
   return join(lines, "\n")
 endfunction
 
+function! s:IsTokenSet() abort
+  if g:vim_ai_config_map['token'] == ""||g:vim_ai_config_map['endpoint_url'] == ""||g:vim_ai_config_map['model'] == ""
+    echoerr "Please set your token, Try to use :AIConfigEdit first"
+    return 0
+  endif
+  return 1
+endfunction
+
 " Complete prompt
 " - config       - function scoped vim_ai_complete config
 " - a:1          - optional instruction prompt
 " - a:2          - optional selection pending (to override g:vim_ai_is_selection_pending)
 function! vim_ai#AIRun(config, ...) range abort
+  if !s:IsTokenSet()
+    return
+  endif
   let l:config = vim_ai_config#ExtendDeep(g:vim_ai_complete, a:config)
   let l:instruction = a:0 > 0 ? a:1 : ""
   " l:is_selection used in Python script
@@ -169,6 +180,9 @@ endfunction
 " - a:1          - optional instruction prompt
 " - a:2          - optional selection pending (to override g:vim_ai_is_selection_pending)
 function! vim_ai#AIEditRun(config, ...) range abort
+  if !s:IsTokenSet()
+    return
+  endif
   let l:config = vim_ai_config#ExtendDeep(g:vim_ai_edit, a:config)
   let l:instruction = a:0 > 0 ? a:1 : ""
   " l:is_selection used in Python script
@@ -237,6 +251,9 @@ endfunction
 " - config       - function scoped vim_ai_chat config
 " - a:1          - optional instruction prompt
 function! vim_ai#AIChatRun(uses_range, config, ...) range abort
+  if !s:IsTokenSet()
+    return
+  endif
   let l:config = vim_ai_config#ExtendDeep(g:vim_ai_chat, a:config)
   let l:instruction = ""
   " l:is_selection used in Python script
@@ -286,6 +303,38 @@ function! vim_ai#AIRedoRun() abort
   elseif s:last_command ==# "chat"
     " chat does not need prompt, all information are in the buffer already
     call vim_ai#AIChatRun(0, s:last_config)
+  endif
+endfunction
+
+" auto precode for config
+func s:PrecodeConfig() abort
+  let l:name_option={
+        \ 'doubao':{
+        \   'endpoint_url': 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+        \   'model':'',
+        \   'token':'',
+        \ },
+        \ 'openai':{
+        \   'endpoint_url': 'https://api.openai.com/v1/chat/completions',
+        \   'model':'gpt-3.5-turbo',
+        \   'token':'',
+        \},
+        \}
+
+  if !has_key(l:name_option,g:vim_ai_name)
+    echoerr "unknown model: " . g:vim_ai_name
+    return
+  else
+    call append(line("."),json_encode(l:name_option[g:vim_ai_name]))
+  endif
+endfunc
+
+" edit config file
+function! vim_ai#AIConfigEditRun() abort
+  let l:file_exist=filereadable(g:vim_ai_config_file_path)
+  exe "edit " . g:vim_ai_config_file_path
+  if !l:file_exist
+    call s:PrecodeConfig()
   endif
 endfunction
 

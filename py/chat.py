@@ -15,6 +15,8 @@ config_ui = config['ui']
 
 def initialize_chat_window():
     lines = vim.eval('getline(1, "$")')
+    vim.command("nnoremap <buffer><enter> :AIChat<cr>")
+    vim.command("setlocal wrap")
     contains_user_prompt = '>>> user' in lines
     if not contains_user_prompt:
         # user role not found, put whole file content as an user prompt
@@ -77,7 +79,7 @@ try:
         }
         printDebug("[chat] request: {}", request)
         url = options['endpoint_url']
-        response = openai_request(url, request, http_options)
+        response = openai_request(url, request, http_options,options['token'])
         def map_chunk(resp):
             printDebug("[chat] response: {}", resp)
             return resp['choices'][0]['delta'].get('content', '')

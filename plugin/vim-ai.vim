@@ -1,6 +1,6 @@
 " Ensure python3 is available
 if !has('python3')
-  echoerr "Python 3 support is required for vim-ai plugin"
+  echoerr "Python 3 support is required for vim-ai-doubao plugin"
   finish
 endif
 
@@ -20,3 +20,4 @@ command! -range   -nargs=? -complete=customlist,vim_ai#RoleCompletion AIEdit    
 command! -range=0 -nargs=? -complete=customlist,vim_ai#RoleCompletion AIChat    <line1>,<line2>call vim_ai#AIChatRun(<count>, {}, <q-args>)
 command! -nargs=?                                                     AINewChat                call vim_ai#AINewChatRun(<f-args>)
 command!                                                              AIRedo                   call vim_ai#AIRedoRun()
+command! -nargs=0                                                     AIConfigEdit             call vim_ai#AIConfigEditRun()
