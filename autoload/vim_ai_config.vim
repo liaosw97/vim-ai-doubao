@@ -18,7 +18,7 @@ endif
 
 " read json from g:vim_ai_config_file_path,and encode to json
 if filereadable(g:vim_ai_config_file_path)
-  let g:vim_ai_config_map = json_decode(join(readfile(g:vim_ai_config_file_path)))
+  let g:vim_ai_config_map = json_decode(join(readfile(g:vim_ai_config_file_path)))[g:vim_ai_name]
   if !has_key(g:vim_ai_config_map, "model")
     let g:vim_ai_config_map["model"] = ""
   endif
@@ -48,7 +48,7 @@ let g:vim_ai_complete_default = {
 \    "temperature": (has_key(g:vim_ai_config_map, "temperature") ? g:vim_ai_config_map["temperature"] : 0.1),
 \    "request_timeout": (has_key(g:vim_ai_config_map, "request_timeout") ? g:vim_ai_config_map["request_timeout"] : 20),
 \    "enable_auth": 1,
-\    "selection_boundary": "#####",
+\    "selection_boundary": "",
 \  },
 \  "ui": {
 \    "paste_mode": 1,

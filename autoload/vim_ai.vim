@@ -310,14 +310,16 @@ endfunction
 func s:PrecodeConfig() abort
   let l:name_option={
         \ 'doubao':{
-        \   'endpoint_url': 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
-        \   'model':'',
-        \   'token':'',
-        \ },
+        \   'endpoint_url': 'https://ark.cn-beijing.volces.com/api/v3/chat/completions','model':'','token':'',
+        \},
+        \ 'tongyi':{
+        \   'endpoint_url': 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', 'model':'qwen-long','token':'',
+        \},
+        \ 'xinhuo':{
+        \   'endpoint_url': 'https://spark-api-open.xf-yun.com/v1/chat/completions', 'model':'generalv3','token':'',
+        \},
         \ 'openai':{
-        \   'endpoint_url': 'https://api.openai.com/v1/chat/completions',
-        \   'model':'gpt-3.5-turbo',
-        \   'token':'',
+        \   'endpoint_url': 'https://api.openai.com/v1/chat/completions', 'model':'gpt-3.5-turbo','token':'',
         \},
         \}
 
@@ -325,7 +327,7 @@ func s:PrecodeConfig() abort
     echoerr "unknown model: " . g:vim_ai_name
     return
   else
-    call append(line("."),json_encode(l:name_option[g:vim_ai_name]))
+    call append(line("."),json_encode(l:name_option))
   endif
 endfunc
 

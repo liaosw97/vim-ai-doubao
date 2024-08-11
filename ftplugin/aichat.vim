@@ -18,6 +18,7 @@ else
         \ 'jsx': 'javascriptreact',
         \ 'ts': 'typescript',
         \ 'tsx': 'typescriptreact',
+        \ 'go': 'go',
         \ }
 endif
 

@@ -1,75 +1,79 @@
 # vim-ai
 
-This plugin adds Artificial Intelligence (AI) capabilities to your Vim and Neovim.
-You can generate code, edit text, or have an interactive conversation with GPT models, all powered by OpenAI's API.
+## 插件介绍
 
-![vim-ai demo](./demo.gif)
+这个插件是 [vim-ai](https://github.com/madox2/vim-ai/wiki) 的中文大模型版,提供了额外的3种中文大语言的支持(目前),使得无需网络就可以实现在vim中的人工智能,以及完善了一些细节和体验
 
-To get an idea what is possible to do with AI commands see the [prompts](https://github.com/madox2/vim-ai/wiki/AI-prompts#prompts) on the [Community Wiki](https://github.com/madox2/vim-ai/wiki)
+这个插件为你的 Vim 和 Neovim 添加了人工智能 (AI) 功能。
 
-## Features
+你可以使用 豆包,通义千问,讯飞星火,OpenAI 的 API 生成代码、编辑文本或与 GPT 模型进行交互对话。
 
-- Generate text or code, answer questions with AI
-- Edit selected text in-place with AI
-- Interactive conversation with ChatGPT
-- Supports custom roles and more
+## 功能
 
-## How it works
+- 使用 AI 生成文本或代码，回答问题
+- 使用 AI 就地编辑选定的文本
+- 与 ChatGPT 进行交互式对话
+- 支持自定义角色等
 
-This plugin uses OpenAI's API to generate responses.
-You will need to [setup](https://platform.openai.com/signup) an account and obtain an [API key](https://platform.openai.com/account/api-keys).
-Usage of the API is not free, but the cost is reasonable and depends on how many tokens you use, in simple terms, how much text you send and receive (see [pricing](https://openai.com/pricing)).
-Note that the plugin does not send any of your code behind the scenes.
-You only share and pay for what you specifically select, for prompts and chat content.
+### 工作原理
 
-## Installation
+这个插件使用 兼容OpenAI 的 API 来生成回复。
 
-### Prerequisites
+你需要自己去获取这个api 的 token
 
-- Vim or Neovim compiled with python3 support
-- [API key](https://platform.openai.com/account/api-keys)
+请注意，该插件不会在后台发送任何代码。你只需要共享和支付你特别选择的内容，例如提示和聊天内容。
 
-```sh
-# save api key to `~/.config/openai.token` file
-echo "YOUR_OPENAI_API_KEY" > ~/.config/openai.token
+- 豆包: 参考 [https://www.volcengine.com/docs/82379/1222542](https://www.volcengine.com/docs/82379/1222542)
+- openai: 参考 [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
+- 通问千义:  参考 [https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen-by-api](https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen-by-api)
+- 迅飞星火: 参考 [https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html](https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html)
 
-# alternatively set it as an environment variable
-export OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
+### 安装
 
-# or configure it with your organization id
-echo "YOUR_OPENAI_API_KEY,YOUR_OPENAI_ORG_ID" > ~/.config/openai.token
-export OPENAI_API_KEY="YOUR_OPENAI_API_KEY,YOUR_OPENAI_ORG_ID"
-```
+#### 前提条件
 
-The default api key file location is `~/.config/openai.token`, but you can change it by setting the `g:vim_ai_config_file_path` in your `.vimrc` file:
+- 支持 python3 的 Vim 或 Neovim
+- 获取 token 和 model(就是你需要调用的模型)
+
+默认的 API 密钥文件位置是 `~/.config/vim-ai-token.json`，但你可以通过在 `.vimrc` 文件中设置 `g:vim_ai_config_file_path` 来更改它：
 
 ```vim
-let g:vim_ai_config_file_path = '~/.config/openai.token'
+let g:vim_ai_config_file_path = '~/.config/vim-ai-token.json'
 ```
 
-### Using `vim-plug`
+#### 使用 `vim-plug`
 
 ```vim
-Plug 'madox2/vim-ai'
+Plug 'chenxuan520/vim-ai-doubao'
 ```
 
-### Manual installation
+#### 手动安装
 
-Using built-in Vim packages `:help packages`
+使用内置的 Vim 包 `:help packages`
 
 ```sh
 # vim
 mkdir -p ~/.vim/pack/plugins/start
-git clone https://github.com/madox2/vim-ai.git ~/.vim/pack/plugins/start/vim-ai
+git clone https://github.com/chenxuan520/vim-ai-doubao.git ~/.vim/pack/plugins/start/vim-ai-doubao
 
 # neovim
 mkdir -p ~/.local/share/nvim/site/pack/plugins/start
-git clone https://github.com/madox2/vim-ai.git ~/.local/share/nvim/site/pack/plugins/start/vim-ai
+git clone https://github.com/chenxuan520/vim-ai-doubao.git ~/.local/share/nvim/site/pack/plugins/start/vim-ai-doubao
 ```
 
-## Usage
+### 配置
 
-To use an AI command, type the command followed by an instruction prompt. You can also combine it with a visual selection. Here is a brief overview of available commands:
+
+- 使用 `:AiConfigEdit` 打开配置文件,这是一个json文件,将你调用模型的 token 和 model 放到相应位置就完成配置了
+- 默认使用豆包大模型补全,如果使用其他大模型添加配置
+
+```vim
+let g:vim_ai_name="xinhuo" " xinhuo ,doubao ,tongyi ,openai
+```
+
+### 用法
+
+要使用 AI 命令，请在命令后输入指令提示。您还可以将其与视觉选择结合使用。以下是可用命令的简要概述：
 
 ```
 ========= Basic AI commands =========
@@ -86,54 +90,54 @@ To use an AI command, type the command followed by an instruction prompt. You ca
 :help vim-ai
 ```
 
-**Tip:** Press `Ctrl-c` anytime to cancel completion
+**提示：** 随时按 `Ctrl-c` 可取消补全。
 
-**Tip:** Setup your own [key bindings](#key-bindings) or use command shortcuts - `:AIE`, `:AIC`, `:AIR`
+**提示：** 设置自己的 [键绑定](#key-bindings) 或使用命令快捷键 - `:AIE`, `:AIC`, `:AIR`。
 
-**Tip:** A [custom role](#roles) {role} can be passed to the above commands by an initial parameter /{role}, for example `:AIEdit /grammar`.
+**提示：** 可以通过初始参数 `/{role}` 将 [自定义角色](#roles) {role} 传递给上述命令，例如 `:AIEdit /grammar`。
 
-**Tip:** Combine commands with a range `:help range`, for example to select the whole buffer - `:%AIE fix grammar`
+**提示：** 可以使用范围 `:help range` 组合命令，例如选择整个缓冲区 - `:%AIE fix grammar`。
 
-If you are interested in more tips or would like to level up your Vim with more commands like [`:GitCommitMessage`](https://github.com/madox2/vim-ai/wiki/Custom-commands#suggest-a-git-commit-message) - suggesting a git commit message, visit the [Community Wiki](https://github.com/madox2/vim-ai/wiki).
+如果您对更多提示感兴趣，或者想使用更多命令（如 `:GitCommitMessage`）来提升您的 Vim 水平 - 例如建议一个 Git 提交消息，请访问 [社区维基](https://github.com/madox2/vim-ai/wiki)。
 
-## Reference
+## 参考
 
-In the documentation below,  `<selection>` denotes a visual selection or any other range, `{instruction}` an instruction prompt, `{role}` a [custom role](#roles) and `?` symbol an optional parameter.
+在下面的文档中，`<selection>`表示视觉选择或任何其他范围，`{instruction}`表示指令提示，`{role}`表示[自定义角色](#roles)，`?`符号表示可选参数。
 
 ### `:AI`
 
-`:AI` - complete the text on the current line
+`:AI` - 完成当前行上的文本。
 
-`:AI {prompt}` - complete the prompt
+`:AI {prompt}` - 完成提示。
 
-`<selection> :AI` - complete the selection
+`<selection> :AI` - 完成选择。
 
-`<selection> :AI {instruction}` - complete the selection using the instruction
+`<selection> :AI {instruction}` - 使用指令完成选择。
 
-`<selection>? :AI /{role} {instruction}?` - use role to complete
+`<selection>? :AI /{role} {instruction}?` - 使用角色完成
 
 ### `:AIEdit`
 
-`<selection>? :AIEdit` - edit the current line or the selection
+`<selection>? :AIEdit` - 编辑当前行或选择
 
-`<selection>? :AIEdit {instruction}` - edit the current line or the selection using the instruction
+`<selection>? :AIEdit {instruction}` - 使用指令编辑当前行或选择
 
-`<selection>? :AIEdit /{role} {instruction}?` - use role to edit
+`<selection>? :AIEdit /{role} {instruction}?` - 使用角色编辑
 
 ### `:AIChat`
 
-`:AIChat` - continue or start a new conversation.
+`:AIChat` - 继续或开始新的对话。
 
-`<selection>? :AIChat {instruction}?` - start a new conversation given the selection, the instruction or both
+`<selection>? :AIChat {instruction}?` - 根据选择、指令或两者开始新的对话
 
-`<selection>? :AIChat /{role} {instruction}?` - use role to complete
+`<selection>? :AIChat /{role} {instruction}?` - 使用角色完成对话
 
-When the AI finishes answering, you can continue the conversation by entering insert mode, adding your prompt, and then using the command `:AIChat` once again.
+当AI完成回答后，你可以通过进入插入模式，添加你的提示符，然后再次使用命令`:AIChat`来继续对话。
 
-#### `.aichat` files
+#### `.aichat`文件
 
-You can edit and save the chat conversation to an `.aichat` file and restore it later.
-This allows you to create re-usable custom prompts, for example:
+你可以编辑并保存聊天对话到一个`.aichat`文件中，并在以后恢复它。
+这允许你创建可重用的自定义提示符，例如：
 
 ```
 # ./refactoring-prompt.aichat
@@ -148,7 +152,7 @@ You are a Clean Code expert, I have the following code, please refactor it in a 
 
 ```
 
-To include files in the chat a special `include` role is used:
+要在聊天中包含文件，可以使用特殊的` include `角色：
 
 ```
 >>> user
@@ -161,28 +165,28 @@ Generate documentation for the following files
 /home/user/myproject/**/*.py
 ```
 
-Each file's contents will be added to an additional `user` role message with the files separated by `==> {path} <==`, where path is the path to the file. Globbing is expanded out via `glob.gob` and relative paths to the current working directory (as determined by `getcwd()`) will be resolved to absolute paths.
+每个文件的内容将被添加到一个额外的`user`角色消息中，文件之间用`==> {路径} <==`分隔，其中路径是文件的路径。通配符通过`glob.gob`展开，相对于当前工作目录（由`getcwd()`确定）的相对路径将被解析为绝对路径。
 
-Supported chat roles are **`>>> system`**, **`>>> user`**, **`>>> include`** and **`<<< assistant`**
+支持的聊天角色是 **`>>> system`**、**`>>> user`**、**`>>> include`** 和 **`<<< assistant`**。
 
 ### `:AINewChat`
 
-`:AINewChat {preset shortname}?` - start a new conversation
+`:AINewChat {preset shortname}?` - 开始一段新的对话
 
-This command is used when you need to spawn a new chat in a specific way or in situation when `:AIChat` would normally continue conversation instead.
+这个命令用于在特定情况下以特定方式生成一个新的聊天，或者在`:AIChat`通常会继续对话的情况下。
 
-As a parameter you put an open chat command preset shortcut - `below`, `tab` or `right`. For example: `:AINewChat right`.
+作为参数，你可以放入一个打开聊天的命令预设快捷方式 - `below`（下方）、`tab`（标签页）或`right`（右侧）。例如：`:AINewChat right`。
 
 ### `:AIRedo`
 
-`:AIRedo` - repeat last AI command
+`:AIRedo` - 重复上一个AI命令
 
-Use this immediately after `AI`/`AIEdit`/`AIChat` command in order to re-try or get an alternative completion.
-Note that the randomness of responses heavily depends on the [`temperature`](https://platform.openai.com/docs/api-reference/completions/create#completions/create-temperature) parameter.
+在`AI`/`AIEdit`/`AIChat`命令之后立即使用此命令，以便重新尝试或获取替代完成。
+请注意，响应的随机性在很大程度上取决于[`temperature`](https://platform.openai.com/docs/api-reference/completions/create#completions/create-temperature)参数。
 
-## Roles
+## 角色配置
 
-In the context of this plugin, a role means a re-usable AI instruction and/or configuration. Roles are defined in the configuration `.ini` file. For example by defining a `grammar` role:
+在这个插件的上下文中，角色意味着一个可重用的AI指令和/或配置。角色在配置文件`.ini`文件中定义。例如，通过定义一个`grammar`角色:
 
 ```vim
 let g:vim_ai_roles_config_file = '/path/to/my/roles.ini'
@@ -198,13 +202,13 @@ prompt = fix spelling and grammar
 temperature = 0.4
 ```
 
-Now you can select text and run it with command `:AIEdit /grammar`.
+现在您可以选择文本并使用命令`:AIEdit /grammar`运行它。
 
-See [roles-example.ini](./roles-example.ini) for more examples.
+有关更多示例，请参阅[roles-example.ini](./roles-example.ini)。
 
-## Key bindings
+## 按键绑定
 
-This plugin does not set any key binding. Create your own bindings in the `.vimrc` to trigger AI commands, for example:
+这个插件没有设置任何快捷键绑定。你可以在`.vimrc`文件中创建自己的绑定来触发AI命令，例如：
 
 ```vim
 " complete text on the current line or in visual selection
@@ -223,234 +227,12 @@ nnoremap <leader>c :AIChat<CR>
 nnoremap <leader>r :AIRedo<CR>
 ```
 
-## Configuration
+## 重要免责声明
 
-Each command is configured with a corresponding configuration variable.
-To customize the default configuration, initialize the config variable with a selection of options, for example put this to your`.vimrc` file:
+**准确性**：GPT擅长生成乍一看正确的文本和代码，但可能完全错误。请务必仔细审查、阅读和测试此插件生成的所有输出！
 
-```vim
-let g:vim_ai_chat = {
-\  "options": {
-\    "model": "gpt-4",
-\    "temperature": 0.2,
-\  },
-\}
-```
+**隐私**：此插件在生成补全和编辑时会向OpenAI发送文本。因此，不要在包含敏感信息的文件中使用它。
 
-Once the above is set, you can modify options directly during the vim session:
+## 许可证
 
-```vim
-let g:vim_ai_chat['options']['model'] = 'gpt-4'
-let g:vim_ai_chat['options']['temperature'] = 0.2
-```
-
-Or customize the options directly in the chat buffer:
-
-```properties
-[chat-options]
-model=gpt-4
-temperature=0.2
-
->>> user
-
-generate a paragraph of lorem ipsum
-```
-
-Below are listed all available configuration options, along with their default values.
-Please note that there isn't any token limit imposed on chat model.
-
-```vim
-" :AI
-" - engine: complete | chat - see how to configure chat engine in the section below
-" - options: openai config (see https://platform.openai.com/docs/api-reference/completions)
-" - options.request_timeout: request timeout in seconds
-" - options.enable_auth: enable authorization using openai key
-" - options.selection_boundary: seleciton prompt wrapper (eliminates empty responses, see #20)
-" - ui.paste_mode: use paste mode (see more info in the Notes below)
-let g:vim_ai_complete = {
-\  "engine": "complete",
-\  "options": {
-\    "model": "gpt-3.5-turbo-instruct",
-\    "endpoint_url": "https://api.openai.com/v1/completions",
-\    "max_tokens": 1000,
-\    "temperature": 0.1,
-\    "request_timeout": 20,
-\    "enable_auth": 1,
-\    "selection_boundary": "#####",
-\  },
-\  "ui": {
-\    "paste_mode": 1,
-\  },
-\}
-
-" :AIEdit
-" - engine: complete | chat - see how to configure chat engine in the section below
-" - options: openai config (see https://platform.openai.com/docs/api-reference/completions)
-" - options.request_timeout: request timeout in seconds
-" - options.enable_auth: enable authorization using openai key
-" - options.selection_boundary: seleciton prompt wrapper (eliminates empty responses, see #20)
-" - ui.paste_mode: use paste mode (see more info in the Notes below)
-let g:vim_ai_edit = {
-\  "engine": "complete",
-\  "options": {
-\    "model": "gpt-3.5-turbo-instruct",
-\    "endpoint_url": "https://api.openai.com/v1/completions",
-\    "max_tokens": 1000,
-\    "temperature": 0.1,
-\    "request_timeout": 20,
-\    "enable_auth": 1,
-\    "selection_boundary": "#####",
-\  },
-\  "ui": {
-\    "paste_mode": 1,
-\  },
-\}
-
-" This prompt instructs model to work with syntax highlighting
-let s:initial_chat_prompt =<< trim END
->>> system
-
-You are a general assistant.
-If you attach a code block add syntax type after ``` to enable syntax highlighting.
-END
-
-" :AIChat
-" - options: openai config (see https://platform.openai.com/docs/api-reference/chat)
-" - options.initial_prompt: prompt prepended to every chat request (list of lines or string)
-" - options.request_timeout: request timeout in seconds
-" - options.enable_auth: enable authorization using openai key
-" - options.selection_boundary: seleciton prompt wrapper (eliminates empty responses, see #20)
-" - ui.populate_options: put [chat-options] to the chat header
-" - ui.open_chat_command: preset (preset_below, preset_tab, preset_right) or a custom command
-" - ui.scratch_buffer_keep_open: re-use scratch buffer within the vim session
-" - ui.paste_mode: use paste mode (see more info in the Notes below)
-let g:vim_ai_chat = {
-\  "options": {
-\    "model": "gpt-4o",
-\    "endpoint_url": "https://api.openai.com/v1/chat/completions",
-\    "max_tokens": 0,
-\    "temperature": 1,
-\    "request_timeout": 20,
-\    "enable_auth": 1,
-\    "selection_boundary": "",
-\    "initial_prompt": s:initial_chat_prompt,
-\  },
-\  "ui": {
-\    "code_syntax_enabled": 1,
-\    "populate_options": 0,
-\    "open_chat_command": "preset_below",
-\    "scratch_buffer_keep_open": 0,
-\    "paste_mode": 1,
-\  },
-\}
-
-" Notes:
-" ui.paste_mode
-" - if disabled code indentation will work but AI doesn't always respond with a code block
-"   therefore it could be messed up
-" - find out more in vim's help `:help paste`
-" options.max_tokens
-" - note that prompt + max_tokens must be less than model's token limit, see #42, #46
-" - setting max tokens to 0 will exclude it from the OpenAI API request parameters, it is
-"   unclear/undocumented what it exactly does, but it seems to resolve issues when the model
-"   hits token limit, which respond with `OpenAI: HTTPError 400`
-```
-
-### Using custom API
-
-It is possible to configure the plugin to use different OpenAI-compatible endpoints.
-See some cool projects listed in [Custom APIs](https://github.com/madox2/vim-ai/wiki/Custom-APIs) section on the [Community Wiki](https://github.com/madox2/vim-ai/wiki).
-
-```vim
-let g:vim_ai_chat = {
-\  "options": {
-\    "endpoint_url": "http://localhost:8000/v1/chat/completions",
-\    "enable_auth": 0,
-\  },
-\}
-```
-
-### Using chat engine for completion and edits
-
-It is possible to configure chat models, such as `gpt-4o`, to be used in `:AI` and `:AIEdit` commands.
-These models are cheaper, but currently less suitable for code editing/completion, as they respond with human-like text and commentary.
-
-Depending on the use case, a good initial prompt can help to instruct the chat model to respond in the desired way:
-
-```vim
-let initial_prompt =<< trim END
->>> system
-
-You are going to play a role of a completion engine with following parameters:
-Task: Provide compact code/text completion, generation, transformation or explanation
-Topic: general programming and text editing
-Style: Plain result without any commentary, unless commentary is necessary
-Audience: Users of text editor and programmers that need to transform/generate text
-END
-
-let chat_engine_config = {
-\  "engine": "chat",
-\  "options": {
-\    "model": "gpt-4o",
-\    "endpoint_url": "https://api.openai.com/v1/chat/completions",
-\    "max_tokens": 0,
-\    "temperature": 0.1,
-\    "request_timeout": 20,
-\    "selection_boundary": "",
-\    "initial_prompt": initial_prompt,
-\  },
-\}
-
-let g:vim_ai_complete = chat_engine_config
-let g:vim_ai_edit = chat_engine_config
-```
-
-## Custom commands
-
-You might find useful a [collection](https://github.com/madox2/vim-ai/wiki/Custom-commands) of custom commands on the [Community Wiki](https://github.com/madox2/vim-ai/wiki).
-
-To create a custom command, you can call `AIRun`, `AIEditRun` and `AIChatRun` functions. For example:
-
-```vim
-" custom command suggesting git commit message, takes no arguments
-function! GitCommitMessageFn()
-  let l:diff = system('git --no-pager diff --staged')
-  let l:prompt = "generate a short commit message from the diff below:\n" . l:diff
-  let l:config = {
-  \  "engine": "chat",
-  \  "options": {
-  \    "model": "gpt-4o",
-  \    "initial_prompt": ">>> system\nyou are a code assistant",
-  \    "temperature": 1,
-  \  },
-  \}
-  call vim_ai#AIRun(l:config, l:prompt)
-endfunction
-command! GitCommitMessage call GitCommitMessageFn()
-
-" custom command that provides a code review for selected code block
-function! CodeReviewFn(range) range
-  let l:prompt = "programming syntax is " . &filetype . ", review the code below"
-  let l:config = {
-  \  "options": {
-  \    "initial_prompt": ">>> system\nyou are a clean code expert",
-  \  },
-  \}
-  exe a:firstline.",".a:lastline . "call vim_ai#AIChatRun(a:range, l:config, l:prompt)"
-endfunction
-command! -range=0 CodeReview <line1>,<line2>call CodeReviewFn(<count>)
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to open a pull request, report an issue, or contribute to the [Community Wiki](https://github.com/madox2/vim-ai/wiki).
-
-## Important Disclaimer
-
-**Accuracy**: GPT is good at producing text and code that looks correct at first glance, but may be completely wrong. Be sure to thoroughly review, read and test all output generated by this plugin!
-
-**Privacy**: This plugin sends text to OpenAI when generating completions and edits. Therefore, do not use it on files containing sensitive information.
-
-## License
-
-[MIT License](https://github.com/madox2/vim-ai/blob/main/LICENSE)
+[MIT许可证](https://github.com/chenxuan520/vim-ai-doubao/blob/main/LICENSE)
