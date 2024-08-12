@@ -10,15 +10,17 @@ if exists('g:vim_markdown_fenced_languages')
   endfor
 else
   let s:filetype_dict = {
-        \ 'c++': 'cpp',
-        \ 'viml': 'vim',
-        \ 'bash': 'sh',
-        \ 'ini': 'dosini',
-        \ 'js': 'javascript',
-        \ 'jsx': 'javascriptreact',
-        \ 'ts': 'typescript',
-        \ 'tsx': 'typescriptreact',
-        \ 'go': 'go',
+        \ 'c'    : 'c',
+        \ 'c++'  : 'cpp',
+        \ 'viml' : 'vim',
+        \ 'bash' : 'sh',
+        \ 'py'   : 'python',
+        \ 'ini'  : 'dosini',
+        \ 'js'   : 'javascript',
+        \ 'jsx'  : 'javascriptreact',
+        \ 'ts'   : 'typescript',
+        \ 'tsx'  : 'typescriptreact',
+        \ 'go'   : 'go',
         \ }
 endif
 
