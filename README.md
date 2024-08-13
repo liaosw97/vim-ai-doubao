@@ -6,7 +6,9 @@
 
 这个插件为你的 Vim 和 Neovim 添加了人工智能 (AI) 功能。
 
-你可以使用 豆包,通义千问,讯飞星火,OpenAI 的 API 生成代码、编辑文本或与 GPT 模型进行交互对话。
+你可以使用 豆包,通义千问,讯飞星火,智谱,百川,kimi,OpenAI 的 API 生成代码、编辑文本或与 GPT 模型进行交互对话。
+
+甚至只要是兼容openai api 的大模型都可以无缝接入
 
 ## 功能
 
@@ -27,6 +29,8 @@
 - openai: 参考 [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 - 通问千义:  参考 [https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen-by-api](https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen-by-api)
 - 迅飞星火: 参考 [https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html](https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html)
+- 智谱: 参考 [https://open.bigmodel.cn/dev/api#http_call](https://open.bigmodel.cn/dev/api#http_call)
+- 百川: 参考 [https://platform.baichuan-ai.com/docs/api#](https://platform.baichuan-ai.com/docs/api#)
 
 ### 安装
 
