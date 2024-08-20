@@ -13,10 +13,14 @@ config_options = {
 }
 config_ui = config['ui']
 
+def initialize_chat_window_option():
+    vim.command("nnoremap <buffer><enter> :AIChat<cr>")
+    vim.command("nnoremap <buffer>i Gi")
+    vim.command("setlocal wrap")
+
 def initialize_chat_window():
     lines = vim.eval('getline(1, "$")')
-    vim.command("nnoremap <buffer><enter> :AIChat<cr>")
-    vim.command("setlocal wrap")
+    initialize_chat_window_option()
     contains_user_prompt = '>>> user' in lines
     if not contains_user_prompt:
         # user role not found, put whole file content as an user prompt
