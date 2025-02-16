@@ -7,16 +7,47 @@ import sys
 import urllib.error
 import urllib.request
 import datetime
+import configparser
+import re
+import subprocess
 
-ai_name = 'xinhuo'
+ai_name = 'doubao'
 config_file = os.path.expanduser('~')+'/.config/vim-ai-token.json'
+# change the path to your role file
+role_file = os.path.expanduser('~')+'/.vim/plugged/vim-ai-doubao/roles-example.ini'
 
-is_debugging = False
+is_debugging = True
 debug_log_file = '/tmp/tgpt.log'
 
 OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
+def replace_command_with_output(text):
+    def replace(match):
+        command = match.group(1)
+        try:
+            result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+            return '\n'+result.decode('utf - 8').strip()+'\n'
+        except subprocess.CalledProcessError as e:
+            print(f"Command execution error: {e.output.decode('utf - 8').strip()}")
+            sys.exit(-1)
+    printDebug("Replace command with output: {}", text)
+    return re.sub(r"`(.*?)`", replace, text)
+
+
+def get_role_config(config_path):
+    # read file from config
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    sections = config.sections()
+    result = {}
+    for section in sections:
+        prompt = config[section]['prompt']
+        prompt = replace_command_with_output(prompt)
+        result[section] = prompt
+    printDebug("Role config: {}", result)
+    return result
+        
 
 def normalize_config(config_path):
     # read file from config
@@ -95,7 +126,7 @@ def complete_engine(prompt):
     }
     http_options = {
         'request_timeout': config_options['request_timeout'],
-            }
+    }
     printDebug("[engine-complete] request: {}", request)
     url = config_options['endpoint_url']
     response = openai_request(
@@ -119,10 +150,26 @@ def render_text_chunks(chunks):
 
 # get prompt for args[1...] to string
 def get_prompt(args):
-    prompt = ""
-    for arg in args[1:]:
-        prompt += arg + " "
-    return prompt.strip()
+    if len(args) < 2:
+        return ""
+    if args[1] == "-h" or args[1] == "--help":
+        print("Usage: tgpt.py /<role> <prompt>")
+        sys.exit(0)
+    if args[1].startswith("/"):
+        role_aim = args[1][1:]
+        config = get_role_config(role_file)
+        if role_aim not in config:
+            print(f"Role {role_aim} not found")
+            sys.exit(-1)
+        prompt = config[role_aim]
+        for arg in args[2:]:
+            prompt += " " + arg
+        return prompt
+    else:
+        prompt = ""
+        for arg in args[1:]:
+            prompt += arg + " "
+        return prompt.strip()
 
 
 prompt = get_prompt(sys.argv)
