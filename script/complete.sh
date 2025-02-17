@@ -19,8 +19,8 @@ parse_ini_sections() {
 _ai() {
     local cur prev ini_file sections
     COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD - 1]}"
-    prev="${COMP_WORDS[COMP_CWORD - 2]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD - 1]}"
     # 请将此处修改为你实际的 ini 文件路径
     ini_file="${HOME}/.vim/plugged/vim-ai-doubao/roles-example.ini"
     sections=$(parse_ini_sections "$ini_file")
