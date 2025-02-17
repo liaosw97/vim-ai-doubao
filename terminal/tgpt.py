@@ -14,7 +14,8 @@ import subprocess
 ai_name = ''
 config_file = os.path.expanduser('~')+'/.config/vim-ai-token.json'
 # change the path to your role file
-role_file = os.path.expanduser('~')+'/.vim/plugged/vim-ai-doubao/roles-example.ini'
+role_file = os.path.expanduser(
+    '~')+'/.vim/plugged/vim-ai-doubao/roles-example.ini'
 
 is_debugging = False
 debug_log_file = '/tmp/tgpt.log'
@@ -22,14 +23,17 @@ debug_log_file = '/tmp/tgpt.log'
 OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
+
 def replace_command_with_output(text):
     def replace(match):
         command = match.group(1)
         try:
-            result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+            result = subprocess.check_output(
+                command, shell=True, stderr=subprocess.STDOUT)
             return '\n'+result.decode('utf - 8').strip()+'\n'
         except subprocess.CalledProcessError as e:
-            print(f"Command execution error: {e.output.decode('utf - 8').strip()}")
+            print(
+                f"Command execution error: {e.output.decode('utf - 8').strip()}")
             sys.exit(-1)
     printDebug("Replace command with output: {}", text)
     return re.sub(r"`(.*?)`", replace, text)
@@ -43,11 +47,10 @@ def get_role_config(config_path):
     result = {}
     for section in sections:
         prompt = config[section]['prompt']
-        prompt = replace_command_with_output(prompt)
         result[section] = prompt
     printDebug("Role config: {}", result)
     return result
-        
+
 
 def normalize_config(config_path):
     # read file from config
@@ -154,6 +157,8 @@ def render_text_chunks(chunks):
         print(text, end='', flush=True)
 
 # get prompt for args[1...] to string
+
+
 def get_prompt(args):
     if len(args) < 2:
         return ""
@@ -166,7 +171,8 @@ def get_prompt(args):
         if role_aim not in config:
             print(f"Role {role_aim} not found")
             sys.exit(-1)
-        prompt = config[role_aim]
+        prompt = replace_command_with_output(config[role_aim])
+        printDebug("Role prompt: {}", prompt)
         for arg in args[2:]:
             prompt += " " + arg
         return prompt
