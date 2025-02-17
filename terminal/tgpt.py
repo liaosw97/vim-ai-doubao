@@ -11,12 +11,12 @@ import configparser
 import re
 import subprocess
 
-ai_name = 'doubao'
+ai_name = ''
 config_file = os.path.expanduser('~')+'/.config/vim-ai-token.json'
 # change the path to your role file
 role_file = os.path.expanduser('~')+'/.vim/plugged/vim-ai-doubao/roles-example.ini'
 
-is_debugging = True
+is_debugging = False
 debug_log_file = '/tmp/tgpt.log'
 
 OPENAI_RESP_DATA_PREFIX = 'data: '
@@ -53,6 +53,11 @@ def normalize_config(config_path):
     # read file from config
     with open(config_path, 'r') as file:
         config_path = json.load(file)
+
+    # if ai_name is empty, choose first key
+    global ai_name
+    if ai_name == '':
+        ai_name = list(config_path.keys())[0]
 
     # normalize config
     normalized = {
@@ -168,7 +173,7 @@ def get_prompt(args):
     else:
         prompt = ""
         for arg in args[1:]:
-            prompt += arg + " "
+            prompt += replace_command_with_output(arg) + " "
         return prompt.strip()
 
 
