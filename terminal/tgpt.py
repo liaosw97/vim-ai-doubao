@@ -122,14 +122,30 @@ def openai_request(url, data, http_options, token):
                     yield openai_obj
 
 
-def complete_engine(prompt):
+def complete_engine(prompt, before_messages=None):
+    messages = []
+
+    if before_messages:
+        for i, message in enumerate(before_messages):
+            if i % 2 == 0:
+                messages.append({
+                    'role': 'user',
+                    'content': message,
+                })
+            else:
+                messages.append({
+                    'role': 'assistant',
+                    'content': message,
+                })
+
+    messages.append({
+        'role': 'user',
+        'content': prompt,
+    })
+
     request = {
         'stream': True,
-        'messages': [
-            {
-                'role': 'user',
-                'content': prompt,
-            }],
+        'messages': messages,
         **openai_options
     }
     http_options = {
@@ -150,43 +166,72 @@ def complete_engine(prompt):
 
 def render_text_chunks(chunks):
     generating_text = False
+    full_text = ""
     for text in chunks:
         if not text.strip() and not generating_text:
             continue  # trim newlines from the beginning
         generating_text = True
+        full_text += text
         print(text, end='', flush=True)
-
-# get prompt for args[1...] to string
+    return full_text
 
 
 def get_prompt(args):
+    # get prompt for args[1...] to string
     if len(args) < 2:
         return ""
-    if args[1] == "-h" or args[1] == "--help":
-        print("Usage: tgpt.py /<role> <prompt>")
+    pos = 1
+    is_chat = False
+    if args[pos] == "-h" or args[pos] == "--help":
+        print("Usage: tgpt.py --chat/-c(optional) /<role>(optional) <prompt>")
         sys.exit(0)
-    if args[1].startswith("/"):
-        role_aim = args[1][1:]
+
+    # use as chat
+    if args[pos] == "-c" or args[pos] == "--chat":
+        is_chat = True
+        pos += 1
+
+    if len(args) > pos and args[pos].startswith("/"):
+        role_aim = args[pos][1:]
         config = get_role_config(role_file)
         if role_aim not in config:
             print(f"Role {role_aim} not found")
             sys.exit(-1)
         prompt = replace_command_with_output(config[role_aim])
         printDebug("Role prompt: {}", prompt)
-        for arg in args[2:]:
+        for arg in args[pos+1:]:
             prompt += " " + arg
-        return prompt
+        return prompt, is_chat
     else:
         prompt = ""
-        for arg in args[1:]:
+        for arg in args[pos:]:
             prompt += replace_command_with_output(arg) + " "
-        return prompt.strip()
+        return prompt.strip(), is_chat
 
 
-prompt = get_prompt(sys.argv)
+prompt, is_chat = get_prompt(sys.argv)
 if prompt:
     chunks = complete_engine(prompt)
-    render_text_chunks(chunks)
+    full_text = render_text_chunks(chunks)
+
+    messages = [prompt]
+    messages.append(full_text)
+    while is_chat:
+        print("\n")
+        print("> ", end="")
+        sys.stdout.flush()
+        user_input = input()
+        if user_input.strip() == "exit" or user_input.strip() == "quit":
+            break
+
+        prompt = user_input
+        chunks = complete_engine(prompt, messages)
+        full_text = render_text_chunks(chunks)
+
+        messages.append(user_input)
+        messages.append(full_text)
+        if full_text.strip() == "":
+            break
 else:
     print("No prompt provided")
 print("")
