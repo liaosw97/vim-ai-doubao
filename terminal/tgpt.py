@@ -9,6 +9,7 @@ import urllib.request
 import datetime
 import configparser
 import re
+import platform
 import subprocess
 
 ai_name = ''
@@ -23,6 +24,29 @@ debug_log_file = '/tmp/tgpt.log'
 OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
+def set_clipboard_text(text):
+    system = platform.system()
+    if system == "Windows":
+        # Windows 系统使用 clip 命令（但 clip 命令需要在 cmd 中运行，这里通过 PowerShell 来调用）
+        command = ['powershell', 'Set-Clipboard', '-Value', text]
+    elif system == "Linux":
+        # Linux 系统使用 xclip 命令
+        command = ['xclip', '-selection', 'clipboard']
+    elif system == "Darwin":  # macOS 系统
+        # macOS 系统使用 pbcopy 命令
+        command = ['pbcopy']
+    else:
+        raise OSError(f"不支持的操作系统: {system}")
+
+    try:
+        process = subprocess.Popen(command, stdin=subprocess.PIPE)
+        process.communicate(text.encode('utf-8'))
+    except subprocess.CalledProcessError as e:
+        print(f"执行命令时出错: {e}")
+        exit(-1)
+    except FileNotFoundError:
+        print(f"未找到对应的剪贴板操作命令，可能是系统未安装相应工具。")
+        exit(-1)
 
 def replace_command_with_output(text):
     def replace(match):
