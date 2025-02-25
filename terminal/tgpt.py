@@ -179,7 +179,7 @@ def render_text_chunks(chunks):
 def get_prompt(args):
     # get prompt for args[1...] to string
     if len(args) < 2:
-        return ""
+        return "", False
     pos = 1
     is_chat = False
     if args[pos] == "-h" or args[pos] == "--help":
