@@ -24,6 +24,7 @@ debug_log_file = '/tmp/tgpt.log'
 OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
+
 def set_clipboard_text(text):
     system = platform.system()
     if system == "Windows":
@@ -48,6 +49,7 @@ def set_clipboard_text(text):
         print(f"未找到对应的剪贴板操作命令，可能是系统未安装相应工具。")
         exit(-1)
 
+
 def replace_command_with_output(text):
     def replace(match):
         command = match.group(1)
@@ -67,13 +69,8 @@ def get_role_config(config_path):
     # read file from config
     config = configparser.ConfigParser()
     config.read(config_path)
-    sections = config.sections()
-    result = {}
-    for section in sections:
-        prompt = config[section]['prompt']
-        result[section] = prompt
-    printDebug("Role config: {}", result)
-    return result
+    printDebug("Role config: {}", config)
+    return config
 
 
 def normalize_config(config_path):
@@ -203,9 +200,11 @@ def render_text_chunks(chunks):
 def get_prompt(args):
     # get prompt for args[1...] to string
     if len(args) < 2:
-        return "", False
+        return "", False, False
     pos = 1
     is_chat = False
+    is_copy = False
+
     if args[pos] == "-h" or args[pos] == "--help":
         print("Usage: tgpt.py --chat/-c(optional) /<role>(optional) <prompt>")
         sys.exit(0)
@@ -221,22 +220,42 @@ def get_prompt(args):
         if role_aim not in config:
             print(f"Role {role_aim} not found")
             sys.exit(-1)
-        prompt = replace_command_with_output(config[role_aim])
+
+        if 'prompt' not in config[role_aim]:
+            print(f"Role {role_aim} has no prompt")
+            sys.exit(-1)
+        if 'copy' in config[role_aim]:
+            # make it into bool type
+            if config[role_aim]['copy'] == 'true':
+                is_copy = True
+            else:
+                is_copy = False
+        if 'chat' in config[role_aim]:
+            # make it into bool type
+            if config[role_aim]['chat'] == 'true':
+                is_chat = True
+            else:
+                is_chat = False
+
+        prompt = replace_command_with_output(config[role_aim]['prompt'])
         printDebug("Role prompt: {}", prompt)
         for arg in args[pos+1:]:
             prompt += " " + arg
-        return prompt, is_chat
+        return prompt, is_chat, is_copy
     else:
         prompt = ""
         for arg in args[pos:]:
             prompt += replace_command_with_output(arg) + " "
-        return prompt.strip(), is_chat
+        return prompt.strip(), is_chat, is_copy
 
 
-prompt, is_chat = get_prompt(sys.argv)
+prompt, is_chat, is_copy = get_prompt(sys.argv)
 if prompt:
     chunks = complete_engine(prompt)
     full_text = render_text_chunks(chunks)
+    if is_copy:
+        set_clipboard_text(full_text)
+        print(" (Result has copied to clipboard)")
 
     messages = [prompt]
     messages.append(full_text)
@@ -245,7 +264,7 @@ if prompt:
         print("> ", end="")
         sys.stdout.flush()
         user_input = input()
-        if user_input.strip() == "exit" or user_input.strip() == "quit":
+        if user_input.strip() == "exit" or user_input.strip() == "quit" or user_input.strip() == "q":
             break
 
         prompt = user_input
