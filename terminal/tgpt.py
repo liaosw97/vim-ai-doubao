@@ -25,6 +25,13 @@ OPENAI_RESP_DATA_PREFIX = 'data: '
 OPENAI_RESP_DONE = '[DONE]'
 
 
+def excape_md_format(text):
+    replace_arr=["```","```bash","```json"]
+    for i in replace_arr:
+        text = text.replace(i,"")
+    return text
+
+
 def set_clipboard_text(text):
     system = platform.system()
     if system == "Windows":
@@ -199,11 +206,10 @@ def render_text_chunks(chunks):
 
 def get_prompt(args):
     # get prompt for args[1...] to string
+    extra_config = {}
     if len(args) < 2:
-        return "", False, False
+        return "", extra_config
     pos = 1
-    is_chat = False
-    is_copy = False
 
     if args[pos] == "-h" or args[pos] == "--help":
         print("Usage: tgpt.py --chat/-c(optional) /<role>(optional) <prompt>")
@@ -211,7 +217,7 @@ def get_prompt(args):
 
     # use as chat
     if args[pos] == "-c" or args[pos] == "--chat":
-        is_chat = True
+        extra_config['chat'] = True
         pos += 1
 
     if len(args) > pos and args[pos].startswith("/"):
@@ -227,34 +233,38 @@ def get_prompt(args):
         if 'copy' in config[role_aim]:
             # make it into bool type
             if config[role_aim]['copy'] == 'true':
-                is_copy = True
+                extra_config['copy'] = True
             else:
-                is_copy = False
+                extra_config['copy'] = False
         if 'chat' in config[role_aim]:
             # make it into bool type
             if config[role_aim]['chat'] == 'true':
-                is_chat = True
+                extra_config['chat'] = True
             else:
-                is_chat = False
+                extra_config['chat'] = False
 
         prompt = replace_command_with_output(config[role_aim]['prompt'])
         printDebug("Role prompt: {}", prompt)
         for arg in args[pos+1:]:
             prompt += " " + arg
-        return prompt, is_chat, is_copy
+        return prompt, extra_config
     else:
         prompt = ""
         for arg in args[pos:]:
             prompt += replace_command_with_output(arg) + " "
-        return prompt.strip(), is_chat, is_copy
+        return prompt.strip(), extra_config
 
 
-prompt, is_chat, is_copy = get_prompt(sys.argv)
+prompt, extra_config = get_prompt(sys.argv)
+is_copy = 'copy' in extra_config and extra_config['copy']
+is_chat = 'chat' in extra_config and extra_config['chat']
+only_code = 'only_code' in extra_config and extra_config['only_code']
+
 if prompt:
     chunks = complete_engine(prompt)
     full_text = render_text_chunks(chunks)
     if is_copy:
-        set_clipboard_text(full_text)
+        set_clipboard_text(excape_md_format(full_text))
         print(" (Result has copied to clipboard)")
 
     messages = [prompt]
