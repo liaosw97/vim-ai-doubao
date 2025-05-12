@@ -4,7 +4,6 @@
 import json
 import os
 import sys
-import urllib.error
 import urllib.request
 import datetime
 import configparser
@@ -26,7 +25,7 @@ OPENAI_RESP_DONE = '[DONE]'
 
 
 def excape_md_format(text):
-    replace_arr=["```","```bash","```json"]
+    replace_arr=["```bash","```json","```"]
     for i in replace_arr:
         text = text.replace(i,"")
     return text
