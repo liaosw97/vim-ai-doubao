@@ -25,9 +25,9 @@ OPENAI_RESP_DONE = '[DONE]'
 
 
 def excape_md_format(text):
-    replace_arr=["```bash","```json","```"]
+    replace_arr = ["```bash", "```json", "```", "\n"]
     for i in replace_arr:
-        text = text.replace(i,"")
+        text = text.replace(i, "")
     return text
 
 
@@ -47,7 +47,7 @@ def set_clipboard_text(text):
 
     try:
         process = subprocess.Popen(command, stdin=subprocess.PIPE)
-        process.communicate(text.encode('utf-8'))
+        process.communicate(text.encode('utf-8'), timeout=3)
     except subprocess.CalledProcessError as e:
         print(f"执行命令时出错: {e}")
         exit(-1)
@@ -262,7 +262,7 @@ only_code = 'only_code' in extra_config and extra_config['only_code']
 if prompt:
     chunks = complete_engine(prompt)
     full_text = render_text_chunks(chunks)
-    if is_copy:
+    if is_copy and sys.stdout.isatty():
         set_clipboard_text(excape_md_format(full_text))
         print(" (Result has copied to clipboard)")
 
