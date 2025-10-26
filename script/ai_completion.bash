@@ -4,12 +4,12 @@ if [[ -n "${ZSH_VERSION}" ]]; then
     autoload -U +X bashcompinit && bashcompinit
 fi
 
-# 解析 ini 文件，返回所有 section 名称
+# 解析 ini 文件，返回所有 section 名称，添加 '/' 前缀
 parse_ini_sections() {
     local ini_file="$1"
     if [[ -f "$ini_file" ]]; then
-        # 使用 grep 提取所有 section 名称
-        grep '^\[\w*\]' "$ini_file" |  tr '[' '/' |tr -d ']'
+        # 使用 grep 提取所有 section 名称，移除左括号并替换为 '/'，移除右括号，添加 '/' 前缀
+        grep '^\[.*\]' "$ini_file" | sed 's/^\[//; s/\].*$//' | sed 's/^/\//'
     else
         echo 'wrong'
     fi
@@ -31,4 +31,3 @@ _ai() {
 
 # 关联补全函数和命令，这里假设命令名为 ai
 complete -F _ai ai
-

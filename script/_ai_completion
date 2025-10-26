@@ -1,0 +1,21 @@
+#compdef ai
+
+# Completion function for the ai command
+_ai() {
+    local -a sections
+    local ini_file="${HOME}/.vim/plugged/vim-ai-doubao/roles-example.ini"
+    
+    # Parse ini file to get section names
+    if [[ -f "$ini_file" ]]; then
+        # Extract section names from ini file, removing brackets and adding '/' prefix
+        sections=("${(@f)$(grep '^\[.*\]' "$ini_file" | sed 's/^\[//; s/\].*$//' | sed 's/^/\//')}")
+    else
+        # Provide generic completions with '/' prefix if ini file not found
+        sections=('/tran' '/grama' '/test' '/explain' '/commit')
+    fi
+    
+    # Define completion options with section descriptions
+    _describe 'role sections' sections
+}
+
+_ai "$@"
